@@ -1,0 +1,46 @@
+# # # NPCShop Config # # #
+# <--> Developed by Silverwolfg11 <--> #
+
+#Main inventory configuration. The one that pops up when an NPC is first clicked.
+maininventory:
+  buy-item:
+    material: diamond
+    placement: 0 #0-9 for the main inventory
+    #Name and Lore optional
+    name: "&aBuy"
+    lore:
+    - "&bOpen the buy inventory!"
+  sell-item:
+    material: diamond_ore
+    placement: 1 #0-9 for the main inventory
+    #Name and Lore optional
+    name: "&bSell"
+    lore:
+      - "&bOpen the sell inventory!"
+
+
+npcshops:
+  #Put the NPC ID
+  1:
+    #Then the title of the inventory
+    title: "&aMerchant's Shop"
+    items:
+      #Put the material: amount buy price sell price
+      stone: "25 200.0 100.0"
+
+
+customitems:
+  #The name of the custom item which will be used to parse items
+  colorbook:
+    #The material
+    material: "enchanted_book"
+    #The display name
+    name: "&4C&6o&el&2o&1r &8Book"
+    lore:
+    - "Add a colored name"
+    - "to your items!"
+    #You can put enchantments
+    #enchantments:
+      #- "Unbreaking 3"
+    #Each custom item needs a unique id so the shop knows to give you a clone of the item.
+    uuid: 1

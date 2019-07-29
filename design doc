@@ -1,0 +1,16 @@
+Commands: reload, getshop changeshopid
+
+Object NPCShop with three inventory holders. These three inventory holders will extend an interface that extends inventory holder.
+This interface will refer back to the NPC shop and contain a type enum.
+Three type enums: MAIN, BUY, SELL
+- The Main Inventory Holder
+- The Buy Inventory Holder
+- The Sell Inventory Holder
+
+The Main Inventory Holder will be the same for all npc shops exempting the title of the inventory.
+It will contain a buy item and sell item that will be defined in the config.
+
+Copy placement methods from GUIShop
+
+Have a config manager class that handles creating the config.
+

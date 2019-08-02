@@ -12,8 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-
 public class InventoryClickListener implements Listener {
 
     private NPCShopPlugin plugin;
@@ -32,7 +30,7 @@ public class InventoryClickListener implements Listener {
         event.setCancelled(true);
 
         //Prevent the use of clicking on items in the player inventory while the shop is open
-        if (!(event.getClickedInventory().getHolder() instanceof NPCInventoryHolder)) return;
+        if (event.getClickedInventory() != null && !(event.getClickedInventory().getHolder() instanceof NPCInventoryHolder)) return;
 
         //Make sure the item is a valid item. All shop items will either have a lore or name, so some type of item meta.
         if (item == null || item.getType().equals(Material.AIR) || !item.hasItemMeta())
@@ -148,7 +146,7 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            player.getInventory().removeItem(clonedItem);
+            removeItem(player, clonedItem, productAmount);
 
             plugin.getEconomy().depositPlayer(player, price);
 
@@ -191,20 +189,44 @@ public class InventoryClickListener implements Listener {
 
     private boolean containsSellItem(Player player, ItemStack stack, int amount) {
         if (stack.getType().equals(Material.PLAYER_HEAD)) {
-            return containsEnoughPlayerHead(player, amount);
+            return player.getInventory().contains(Material.PLAYER_HEAD, amount);
         } else
             return player.getInventory().containsAtLeast(stack, amount);
     }
 
-    private boolean containsEnoughPlayerHead(Player player, int amount) {
-        for (ItemStack stack : player.getInventory().getContents()) {
-            if (stack == null || !stack.getType().equals(Material.PLAYER_HEAD)) continue;
+    private void removeItem(Player player, ItemStack stack, int amount) {
+        if (stack.getType().equals(Material.PLAYER_HEAD)) {
+            removeMaterial(player, amount, Material.PLAYER_HEAD);
+        } else
+            player.getInventory().removeItem(stack);
+    }
 
-            amount -= stack.getAmount();
+    private void removeMaterial(Player player, int amount, Material mat) {
 
-            if (amount <= 0) return true;
+        ItemStack[] contents = player.getInventory().getContents();
+        int contentsLength = contents.length;
+
+        ItemStack stack;
+        for (int i = 0; i < contentsLength; i++) {
+            stack = contents[i];
+
+            if (stack == null || !stack.getType().equals(mat)) continue;
+
+            //If amount is greater than the stack amount, set the stack to null.
+            if(amount >= stack.getAmount()) {
+                amount -= stack.getAmount();
+                player.getInventory().setItem(i, null);
+            }
+            //If amount is less than stack amount, set stack amount to stack amount - amount.
+            else {
+                stack.setAmount(stack.getAmount() - amount);
+                player.getInventory().setItem(i, stack);
+                amount = 0;
+            }
+
+            if (amount <= 0) break;
         }
 
-        return false;
+        player.updateInventory();
     }
 }

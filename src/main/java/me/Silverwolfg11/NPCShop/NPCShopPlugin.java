@@ -36,7 +36,7 @@ public class NPCShopPlugin extends JavaPlugin {
 
         registerListeners();
 
-        customItemManager = new CustomItemManager();
+        customItemManager = new CustomItemManager(this);
         configManager = new ConfigManager(this);
 
         getCommand("npcshop").setExecutor(new NPCShopCommand(this));

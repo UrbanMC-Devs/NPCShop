@@ -3,7 +3,6 @@ main: me.Silverwolfg11.NPCShop.NPCShopPlugin
 version: 1.0
 api-version: 1.14
 depend: [Vault, Citizens]
-softdepend: [ProtocolLib]
 description: A plugin that allows you to create shops for NPCs
 commands:
   npcshop:

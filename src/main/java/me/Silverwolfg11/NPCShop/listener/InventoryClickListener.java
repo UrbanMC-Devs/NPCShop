@@ -2,8 +2,10 @@ package me.Silverwolfg11.NPCShop.listener;
 
 import me.Silverwolfg11.NPCShop.NPCShopPlugin;
 import me.Silverwolfg11.NPCShop.objects.NPCInventoryHolder;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +13,9 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.HashMap;
 
 public class InventoryClickListener implements Listener {
 
@@ -101,8 +106,9 @@ public class InventoryClickListener implements Listener {
             ItemStack clonedItem;
 
             //Check if it's a cloned item
-            if (plugin.getCustomItemManager().isCustomShopItem(item)) {
-                clonedItem = plugin.getCustomItemManager().getItemFromItemUUID(item).clone();
+            if (isCustomShopItem(meta)) {
+                clonedItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta)).clone();
+                removeCustomShopId(clonedItem);
             } else {
                 clonedItem = item.clone();
 
@@ -121,7 +127,7 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            player.getInventory().addItem(clonedItem);
+            HashMap<Integer, ItemStack> addMap = player.getInventory().addItem(clonedItem);
 
             plugin.getEconomy().withdrawPlayer(player, price);
 
@@ -135,8 +141,9 @@ public class InventoryClickListener implements Listener {
 
             ItemStack clonedItem;
 
-            if (plugin.getCustomItemManager().isCustomShopItem(item)) {
-                clonedItem = plugin.getCustomItemManager().getItemFromItemUUID(item).clone();
+            if (isCustomShopItem(meta)) {
+                clonedItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta)).clone();
+                removeCustomShopId(clonedItem);
             } else {
                 clonedItem = new ItemStack(item.getType(), productAmount);
             }
@@ -169,7 +176,7 @@ public class InventoryClickListener implements Listener {
 
         int increment = is.getMaxStackSize();
 
-        for (ItemStack stack : p.getInventory().getContents()) {
+        for (ItemStack stack : p.getInventory().getStorageContents()) {
             if (stack == null || stack.getType().equals(Material.AIR)) {
                 amount -= increment;
             } else if (is.isSimilar(stack)) {
@@ -228,5 +235,21 @@ public class InventoryClickListener implements Listener {
         }
 
         player.updateInventory();
+    }
+
+    private boolean isCustomShopItem(ItemMeta meta) {
+        return meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "npcshopid"), PersistentDataType.INTEGER);
+    }
+
+    private int getCustomShopItem(ItemMeta meta) {
+        return meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "npcshopid"), PersistentDataType.INTEGER);
+    }
+
+    private void removeCustomShopId(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+
+        meta.getPersistentDataContainer().remove(new NamespacedKey(plugin, "npcshopid"));
+
+        stack.setItemMeta(meta);
     }
 }

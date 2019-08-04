@@ -10,6 +10,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,27 +19,26 @@ import java.util.stream.Collectors;
 public class CustomItemManager {
 
     private HashMap<Integer, ItemStack> customItem = new HashMap<>();
-    private boolean protLib;
-    private ProtocolNBT protNBTManager;
+    private NPCShopPlugin plugin;
 
-    public CustomItemManager() {
-        protLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
+    public CustomItemManager(NPCShopPlugin plugin) {
 
-        if (protLib) protNBTManager = new ProtocolNBT();
+        this.plugin = plugin;
     }
 
 
     HashMap<String, ItemStack> loadCustomItems(YamlConfiguration config) {
         HashMap<String, ItemStack> customItemMap = new HashMap<>();
 
-        if (!protLib) {
-            Bukkit.getLogger().warning("[NPCShop] Cannot load custom items because ProtocolLib is missing!");
-            return customItemMap;
-        }
+        if (!customItem.isEmpty()) customItem.clear();
 
         if (!config.contains("customitems")) return customItemMap;
 
         ConfigurationSection section = config.getConfigurationSection("customitems");
+
+        NamespacedKey namespacedKey = new NamespacedKey(plugin, "npcshopid");
+
+        int id = 1;
 
         for (String itemPath : section.getKeys(false)) {
             String quickpath = "customitems." + itemPath + ".";
@@ -49,13 +49,6 @@ public class CustomItemManager {
                 mat = Material.valueOf(config.getString(quickpath + "material", "null").toUpperCase());
             } catch (IllegalArgumentException ex) {
                 Bukkit.getLogger().warning("[NPCShop] Error loading material for custom item " + itemPath);
-                continue;
-            }
-
-            int uuid = config.getInt(quickpath + "uuid", -1);
-
-            if (uuid == -1) {
-                Bukkit.getLogger().warning("[NPCShop] Error loading UUID for custom item " + itemPath);
                 continue;
             }
 
@@ -88,11 +81,15 @@ public class CustomItemManager {
                     enchantMap.forEach((key, value) -> meta.addEnchant(key, value, true));
             }
 
+            meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, id);
+
             stack.setItemMeta(meta);
 
-            customItem.put(uuid, stack);
+            customItem.put(id, stack);
 
-            customItemMap.put(itemPath, protNBTManager.setCustomShopItemID(stack, uuid));
+            id++;
+
+            customItemMap.put(itemPath, stack);
         }
 
         return customItemMap;
@@ -136,14 +133,8 @@ public class CustomItemManager {
         return enchantMap;
     }
 
-    public ItemStack getItemFromItemUUID(ItemStack stack) {
-        if (!protLib) return null;
-        return customItem.get(protNBTManager.getShopItemID(stack));
-    }
-
-    public boolean isCustomShopItem(ItemStack stack) {
-        if (!protLib) return false;
-        return protNBTManager.checkIfCustomShopItem(stack);
+    public ItemStack getItemFromIDMap(int id) {
+        return customItem.get(id);
     }
 
 }

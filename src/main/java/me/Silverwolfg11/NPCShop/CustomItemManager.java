@@ -22,7 +22,6 @@ public class CustomItemManager {
     private NPCShopPlugin plugin;
 
     public CustomItemManager(NPCShopPlugin plugin) {
-
         this.plugin = plugin;
     }
 
@@ -32,6 +31,7 @@ public class CustomItemManager {
 
         if (!customItem.isEmpty()) customItem.clear();
 
+        // If there are no custom items, return the empty map
         if (!config.contains("customitems")) return customItemMap;
 
         ConfigurationSection section = config.getConfigurationSection("customitems");

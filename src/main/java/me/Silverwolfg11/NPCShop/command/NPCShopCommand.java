@@ -37,6 +37,13 @@ public class NPCShopCommand implements CommandExecutor {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("save")) {
+            plugin.getTransactionManager().getTask().runTaskAsynchronously(plugin);
+
+            sendColor(sender, "&aNPCShop transaction data has been saved!");
+            return true;
+        }
+
         return true;
     }
 

@@ -42,5 +42,3 @@ customitems:
     #You can put enchantments
     #enchantments:
       #- "Unbreaking 3"
-    #Each custom item needs a unique id so the shop knows to give you a clone of the item.
-    uuid: 1

@@ -2,7 +2,7 @@ name: NPCShop
 main: me.Silverwolfg11.NPCShop.NPCShopPlugin
 version: 1.0
 api-version: 1.14
-depend: [Vault, Citizens]
+depend: [Vault, Citizens, TimerLib]
 description: A plugin that allows you to create shops for NPCs
 commands:
   npcshop:

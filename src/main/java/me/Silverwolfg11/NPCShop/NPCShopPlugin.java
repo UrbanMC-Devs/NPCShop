@@ -3,7 +3,9 @@ package me.Silverwolfg11.NPCShop;
 import me.Silverwolfg11.NPCShop.command.NPCShopCommand;
 import me.Silverwolfg11.NPCShop.listener.InventoryClickListener;
 import me.Silverwolfg11.NPCShop.listener.NPCClickListener;
+import me.Silverwolfg11.NPCShop.listener.TimerLibListener;
 import me.Silverwolfg11.NPCShop.objects.NPCShop;
+import me.Silverwolfg11.NPCShop.transactiondata.TransactionManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -20,6 +22,8 @@ public class NPCShopPlugin extends JavaPlugin {
     private ConfigManager configManager;
     private CustomItemManager customItemManager;
 
+    private TransactionManager dataManager;
+
     private HashMap<Integer, NPCShop> shopLink = new HashMap<>();
 
     //Store the buy item, the sell item, and the maininventory here.
@@ -29,7 +33,7 @@ public class NPCShopPlugin extends JavaPlugin {
     public void onEnable() {
 
         if (!setupEconomy() ) {
-            Bukkit.getLogger().severe( "[SignShop] Disabling due to no Vault dependency found!");
+            Bukkit.getLogger().severe( "[NPCShop] Disabling due to no Vault dependency found!");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -39,7 +43,14 @@ public class NPCShopPlugin extends JavaPlugin {
         customItemManager = new CustomItemManager(this);
         configManager = new ConfigManager(this);
 
+        dataManager = new TransactionManager();
+
         getCommand("npcshop").setExecutor(new NPCShopCommand(this));
+    }
+
+    public void onDisable() {
+        if(dataManager != null)
+            dataManager.onDisable();
     }
 
     private boolean setupEconomy() {
@@ -59,6 +70,9 @@ public class NPCShopPlugin extends JavaPlugin {
     private void registerListeners() {
         Bukkit.getPluginManager().registerEvents(new InventoryClickListener(this), this);
         Bukkit.getPluginManager().registerEvents(new NPCClickListener(this), this);
+
+        if (Bukkit.getPluginManager().getPlugin("TimerLib") != null)
+            Bukkit.getPluginManager().registerEvents(new TimerLibListener(this), this);
     }
 
     public ItemStack getBuyItem() { return buyItem; }
@@ -93,5 +107,7 @@ public class NPCShopPlugin extends JavaPlugin {
     public void reload() { configManager.reload(); }
 
     public CustomItemManager getCustomItemManager() { return customItemManager; }
+
+    public TransactionManager getTransactionManager() { return dataManager; }
 
 }

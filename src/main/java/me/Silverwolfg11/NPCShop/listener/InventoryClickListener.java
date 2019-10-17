@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class InventoryClickListener implements Listener {
 
@@ -119,7 +120,6 @@ public class InventoryClickListener implements Listener {
                 clonedItem.setItemMeta(newItemMeta);
             }
 
-
             clonedItem.setAmount(productAmount);
 
             if (!checkSpace(player, clonedItem)) {
@@ -127,7 +127,9 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            HashMap<Integer, ItemStack> addMap = player.getInventory().addItem(clonedItem);
+            player.getInventory().addItem(clonedItem);
+
+            plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
 
             plugin.getEconomy().withdrawPlayer(player, price);
 
@@ -148,12 +150,30 @@ public class InventoryClickListener implements Listener {
                 clonedItem = new ItemStack(item.getType(), productAmount);
             }
 
+            // This is a special sell feature which allows players to sell all of that item in their inventory
+            if (event.getAction() == InventoryAction.UNKNOWN) {
+                int maxProductAmount = getMaxProductAmount(player, clonedItem);
+
+                if (maxProductAmount > 0) {
+                    int initialProduct = productAmount / priceMultiplier; // Calculate the initial product
+                    maxProductAmount = (maxProductAmount / initialProduct) * initialProduct; // Use integer division to get most product.
+
+                    if (maxProductAmount > 0) {
+                        productAmount = maxProductAmount;
+                        clonedItem.setAmount(productAmount);
+                        price = (price / priceMultiplier) * ((double) (maxProductAmount / initialProduct));
+                    }
+                }
+            }
+
             if (!containsSellItem(player, clonedItem, productAmount)) {
                 player.sendMessage(ChatColor.DARK_RED + "You do not have enough of this item to sell!");
                 return;
             }
 
             removeItem(player, clonedItem, productAmount);
+
+            plugin.getTransactionManager().sellItem(clonedItem.getType(), productAmount);
 
             plugin.getEconomy().depositPlayer(player, price);
 
@@ -192,6 +212,22 @@ public class InventoryClickListener implements Listener {
     private String shortenedForm(double price) {
         //Checks if the priced floored is equal to the price, if it is return a cast-downed integer otherwise return the double.
         return "" + ((price == Math.floor(price)) ? (int) price : price);
+    }
+
+    private int getMaxProductAmount(Player player, ItemStack stack) {
+        if (stack.getType().equals(Material.PLAYER_HEAD)) {
+            stack = new ItemStack(Material.PLAYER_HEAD, stack.getAmount());
+        }
+
+        int size = 0;
+        for (ItemStack content : player.getInventory().getStorageContents()) {
+            if (content == null || content.getType().equals(Material.AIR)) continue;
+
+            if (content.isSimilar(stack))
+                size += content.getAmount();
+        }
+
+        return size;
     }
 
     private boolean containsSellItem(Player player, ItemStack stack, int amount) {

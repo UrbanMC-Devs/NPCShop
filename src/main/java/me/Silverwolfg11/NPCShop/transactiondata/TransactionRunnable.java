@@ -59,12 +59,15 @@ public class TransactionRunnable extends BukkitRunnable {
             });
         }
 
-        transactionmap = null; // Release map
-
         try(PrintWriter writer = new PrintWriter(FILE)) {
             writer.write(MapSerializer.serialize(map));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Release
+        transactionmap.clear(); // Release map
+        transactionmap = null;
+        map.clear();
     }
 }

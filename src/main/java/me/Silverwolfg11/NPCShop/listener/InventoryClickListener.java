@@ -151,7 +151,7 @@ public class InventoryClickListener implements Listener {
             }
 
             // This is a special sell feature which allows players to sell all of that item in their inventory
-            if (event.getAction() == InventoryAction.UNKNOWN) {
+            if (event.getAction() == InventoryAction.UNKNOWN || event.getAction() == InventoryAction.NOTHING) {
                 int maxProductAmount = getMaxProductAmount(player, clonedItem);
 
                 if (maxProductAmount > 0) {

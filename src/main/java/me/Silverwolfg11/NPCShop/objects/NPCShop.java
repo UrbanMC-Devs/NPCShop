@@ -8,14 +8,23 @@ import java.util.List;
 
 public class NPCShop {
 
-    String title;
+    private String title;
+    private boolean useBank;
+
+    private NPCInventoryHolder buyInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.BUY),
+                               sellInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.SELL);
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    private NPCInventoryHolder buyInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.BUY),
-            sellInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.SELL);
+    public void setBankUse(boolean b) {
+        this.useBank = b;
+    }
+
+    public boolean useBank() {
+        return useBank;
+    }
 
     public void createBuyInventory(List<ItemStack> items) {
         buyInventory.createInventory(ChatColor.translateAlternateColorCodes('&', title + " [Buy]"), items);

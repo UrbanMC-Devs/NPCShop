@@ -21,6 +21,7 @@ public class NPCClickListener implements Listener {
             NPCShop shop = plugin.getNPCShopFromID(event.getNPC().getId());
 
             event.getClicker().openInventory(shop.generateMainInventory(plugin.getMainInventory()));
+            event.setCancelled(true);
         }
     }
 }

@@ -2,7 +2,7 @@ package me.Silverwolfg11.NPCShop.listener;
 
 import me.Silverwolfg11.NPCShop.NPCShopPlugin;
 import me.Silverwolfg11.NPCShop.objects.NPCInventoryHolder;
-import org.bukkit.Bukkit;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -90,12 +90,14 @@ public class InventoryClickListener implements Listener {
         //Get the first line of lore. Should contain the buy price or sell price;
         String line0 = ChatColor.stripColor(meta.getLore().get(0));
 
-        double balance = plugin.getEconomy().getBalance(player);
+        boolean useBanks = holder.getNPCShop().useBank();
+
+        double balance = getBalance(player, useBanks);
 
         //Handle buying
         if (holder.getInventoryType().equals(NPCInventoryHolder.NPCInventoryType.BUY)) {
             //Buy Price: 50.0
-            double price = Double.valueOf(line0.substring(11));
+            double price = Double.parseDouble(line0.substring(11));
 
             price *= priceMultiplier;
 
@@ -131,13 +133,13 @@ public class InventoryClickListener implements Listener {
 
             plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
 
-            plugin.getEconomy().withdrawPlayer(player, price);
+            withdrawAmount(player, price, useBanks);
 
             player.sendMessage(ChatColor.GREEN + "Bought " + productAmount + " for $" + shortenedForm(price) + "!");
         }
         //Handle selling
         else if(holder.getInventoryType().equals(NPCInventoryHolder.NPCInventoryType.SELL)) {
-            double price = Double.valueOf(line0.substring(12));
+            double price = Double.parseDouble(line0.substring(12));
 
             price *= priceMultiplier;
 
@@ -175,7 +177,7 @@ public class InventoryClickListener implements Listener {
 
             plugin.getTransactionManager().sellItem(clonedItem.getType(), productAmount);
 
-            plugin.getEconomy().depositPlayer(player, price);
+            depositAmount(player, price, useBanks);
 
             player.sendMessage(ChatColor.GREEN + "Sold " + productAmount + " for $" + shortenedForm(price) + "!");
         }
@@ -287,5 +289,36 @@ public class InventoryClickListener implements Listener {
         meta.getPersistentDataContainer().remove(new NamespacedKey(plugin, "npcshopid"));
 
         stack.setItemMeta(meta);
+    }
+
+    // Economy methods
+
+    private double getBalance(Player player, boolean useBank) {
+        if (useBank) {
+            EconomyResponse response =  plugin.getEconomy().bankBalance("personal_" + player.getUniqueId().toString());
+
+            if (response.transactionSuccess())
+                return response.balance;
+
+            return 0;
+        }
+
+        return plugin.getEconomy().getBalance(player);
+    }
+
+    private void withdrawAmount(Player player, double amount, boolean useBank) {
+        if (useBank) {
+            plugin.getEconomy().bankWithdraw("personal_" + player.getUniqueId().toString(), amount);
+        }
+
+        plugin.getEconomy().withdrawPlayer(player, amount);
+    }
+
+    private void depositAmount(Player player, double amount, boolean useBank) {
+        if (useBank) {
+            plugin.getEconomy().bankDeposit("personal_" + player.getUniqueId().toString(), amount);
+        }
+
+        plugin.getEconomy().depositPlayer(player, amount);
     }
 }

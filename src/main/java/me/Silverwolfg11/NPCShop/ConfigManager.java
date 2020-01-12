@@ -67,7 +67,7 @@ public class ConfigManager {
 
             //Make sure the NPC ID is a valid integer
             try {
-                npcID = Integer.valueOf(path);
+                npcID = Integer.parseInt(path);
             } catch (NumberFormatException ex) {
                 throwError("Cannot load NPC Shop because " + path + " is an invalid NPC ID");
                 continue;
@@ -82,7 +82,8 @@ public class ConfigManager {
             newShop.setTitle(shopTitle);
 
             // Create two arrays for later use in order to create the buy and sell inventories for the shop.
-            List<ItemStack> buyItems = new ArrayList<>(), sellItems = new ArrayList<>();
+            List<ItemStack> buyItems = new ArrayList<>(),
+                            sellItems = new ArrayList<>();
 
             for (String itemPath : config.getConfigurationSection("npcshops." + path + ".items").getKeys(false)) {
                 String backPath = "npcshops." + path + ".items";
@@ -206,6 +207,10 @@ public class ConfigManager {
                 continue;
             }
 
+            // Check if the NPCShop should use vault banks
+            boolean useBank = config.getBoolean("npcshops." + path + ".bank", false);
+            newShop.setBankUse(useBank);
+
             // Add the newly loaded NPC Shop to the link hashmap
             plugin.addNPCShop(npcID, newShop);
         }
@@ -275,7 +280,7 @@ public class ConfigManager {
     }
 
     private void throwError(String error) {
-        Bukkit.getLogger().warning("[NPCShop] " + error);
+        plugin.getLogger().warning(error);
     }
 
     public void reload() {

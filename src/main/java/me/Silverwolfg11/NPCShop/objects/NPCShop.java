@@ -44,9 +44,13 @@ public class NPCShop {
         return newHolder.createInventory(ChatColor.translateAlternateColorCodes('&', title), reference);
     }
 
-    public Inventory getBuyInventory() { return buyInventory.getInventory(); }
+    public Inventory getBuyInventory() {
+        return buyInventory != null ? buyInventory.getInventory() : null;
+    }
 
-    public Inventory getSellInventory() { return sellInventory.getInventory(); }
+    public Inventory getSellInventory() {
+        return sellInventory != null ? sellInventory.getInventory() : null;
+    }
 
 
 }

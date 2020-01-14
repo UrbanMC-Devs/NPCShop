@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -53,9 +54,15 @@ public class InventoryClickListener implements Listener {
         if (holder.getInventoryType().equals(NPCInventoryHolder.NPCInventoryType.MAIN)) {
 
             if (isBuyItem(item)) {
-                player.openInventory(holder.getNPCShop().getBuyInventory());
+                Inventory buyInventory = holder.getNPCShop().getBuyInventory();
+
+                if (buyInventory != null)
+                    player.openInventory(buyInventory);
             } else if (isSellItem(item)) {
-                player.openInventory(holder.getNPCShop().getSellInventory());
+                Inventory sellInventory = holder.getNPCShop().getSellInventory();
+
+                if (sellInventory != null)
+                    player.openInventory(sellInventory);
             }
 
             return;

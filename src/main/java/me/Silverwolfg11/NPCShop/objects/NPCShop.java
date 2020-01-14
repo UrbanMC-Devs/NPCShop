@@ -11,8 +11,8 @@ public class NPCShop {
     private String title;
     private boolean useBank;
 
-    private NPCInventoryHolder buyInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.BUY),
-                               sellInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.SELL);
+    private NPCInventoryHolder buyInventory,
+                               sellInventory;
 
     public void setTitle(String title) {
         this.title = title;
@@ -27,10 +27,12 @@ public class NPCShop {
     }
 
     public void createBuyInventory(List<ItemStack> items) {
+        buyInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.BUY);
         buyInventory.createInventory(ChatColor.translateAlternateColorCodes('&', title + " [Buy]"), items);
     }
 
     public void createSellInventory(List<ItemStack> items) {
+        sellInventory = new NPCInventoryHolder(this, NPCInventoryHolder.NPCInventoryType.SELL);
         sellInventory.createInventory(ChatColor.translateAlternateColorCodes('&', title + " [Sell]"), items);
     }
 

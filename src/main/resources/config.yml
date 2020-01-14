@@ -24,6 +24,7 @@ npcshops:
   1:
     #Then the title of the inventory
     title: "&aMerchant's Shop"
+    bank: false # This value represents whether to use Vault bank accounts for transactions. Optional, will default to false.
     items:
       #Put the material: amount buy price sell price
       stone: "25 200.0 100.0"

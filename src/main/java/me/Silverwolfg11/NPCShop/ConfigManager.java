@@ -199,8 +199,12 @@ public class ConfigManager {
 
             //Create both the buy and sell inventories
             try {
-                newShop.createBuyInventory(buyItems);
-                newShop.createSellInventory(sellItems);
+                // Don't create the inventories if the items are empty
+                if (!buyItems.isEmpty())
+                    newShop.createBuyInventory(buyItems);
+
+                if (!sellItems.isEmpty())
+                    newShop.createSellInventory(sellItems);
             } catch (Exception ex) {
                 throwError("Error creating inventories for npc shop " + path);
                 ex.printStackTrace();

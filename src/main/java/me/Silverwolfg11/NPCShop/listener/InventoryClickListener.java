@@ -225,7 +225,7 @@ public class InventoryClickListener implements Listener {
 
     private int getMaxProductAmount(Player player, ItemStack stack) {
         if (stack.getType().equals(Material.PLAYER_HEAD)) {
-            stack = new ItemStack(Material.PLAYER_HEAD, stack.getAmount());
+            return getMaxHeads(player);
         }
 
         int size = 0;
@@ -234,6 +234,19 @@ public class InventoryClickListener implements Listener {
 
             if (content.isSimilar(stack))
                 size += content.getAmount();
+        }
+
+        return size;
+    }
+
+    // Directly count player heads because issimilar does not work that well for them
+    private int getMaxHeads(Player player) {
+        int size = 0;
+        for (ItemStack content : player.getInventory().getStorageContents()) {
+            if (content == null || content.getType() != Material.PLAYER_HEAD)
+                continue;
+
+            size += content.getAmount();
         }
 
         return size;

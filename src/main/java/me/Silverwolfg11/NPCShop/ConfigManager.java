@@ -102,8 +102,8 @@ public class ConfigManager {
                     int buySpaces, sellSpaces;
 
                     try {
-                        buySpaces = Integer.valueOf(infoSplit[0]);
-                        sellSpaces = Integer.valueOf(infoSplit[1]);
+                        buySpaces = Integer.parseInt(infoSplit[0]);
+                        sellSpaces = Integer.parseInt(infoSplit[1]);
                     } catch (NumberFormatException ex) {
                         throwError("Buy/sell spaces are not valid integers for " + itemPath + " for npc shop " + path);
                         buySpaces = 0;
@@ -155,7 +155,7 @@ public class ConfigManager {
 
                 //Make sure the amount is valid
                 try {
-                    amount = Integer.valueOf(infoSplit[0]);
+                    amount = Integer.parseInt(infoSplit[0]);
                 } catch (NumberFormatException ex) {
                     throwError("Cannot load amount for shop item " + itemPath + " for npc shop " + path);
                     amount = 1;
@@ -167,14 +167,14 @@ public class ConfigManager {
 
                 // Make sure the buy price and the sell price are valid
                 try {
-                    buyPrice = Double.valueOf(infoSplit[1]);
+                    buyPrice = Double.parseDouble(infoSplit[1]);
                 } catch (NumberFormatException ex) {
                     throwError("Cannot load buy price for shop item " + itemPath + " for npc shop " + path);
                     buyPrice = 200;
                 }
 
                 try {
-                    sellPrice = Double.valueOf(infoSplit[2]);
+                    sellPrice = Double.parseDouble(infoSplit[2]);
                 } catch (NumberFormatException ex) {
                     throwError("Cannot load sell price for shop item " + itemPath + " for npc shop " + path);
                     sellPrice = 100;
@@ -264,7 +264,9 @@ public class ConfigManager {
         if (config.contains(path + ".lore")) {
             List<String> configlore = config.getStringList(path + ".lore"), loreList = new ArrayList<>();
 
-            configlore.forEach(string -> loreList.add(ChatColor.translateAlternateColorCodes('&', string)));
+            for (String string : configlore) {
+                loreList.add(ChatColor.translateAlternateColorCodes('&', string));
+            }
 
             meta.setLore(loreList);
         }

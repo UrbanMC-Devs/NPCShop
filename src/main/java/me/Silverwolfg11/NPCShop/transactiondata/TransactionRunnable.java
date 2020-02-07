@@ -24,6 +24,10 @@ public class TransactionRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
+        // Don't run on empty transaction map.
+        if (transactionmap.isEmpty())
+            return;
+
         Bukkit.getLogger().info("[NPCShop] Saving transaction data!");
 
         Map<Material, ItemTransaction> map = null;

@@ -43,3 +43,20 @@ customitems:
     #You can put enchantments
     #enchantments:
       #- "Unbreaking 3"
+  nuketnt:
+    #The material
+    material: "tnt"
+    #The display name
+    name: "&cNuker"
+    lore:
+      - "Nuke yourself!"
+    # Give the itemstack when a player buys this?
+    giveonbuy: false
+    # Take the itemstack when a player sell this?
+    takeonsell: false
+    # Custom Items can execute commands!
+    buycommands:
+      # The <player> is a placeholder for the player name!
+      - "nuke <player>"
+    sellcommands:
+      - "say <player> sold his soul!"

@@ -1,6 +1,7 @@
 package me.Silverwolfg11.NPCShop.listener;
 
 import me.Silverwolfg11.NPCShop.NPCShopPlugin;
+import me.Silverwolfg11.NPCShop.objects.CustomShopItem;
 import me.Silverwolfg11.NPCShop.objects.NPCInventoryHolder;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
@@ -113,11 +114,13 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
+            CustomShopItem customItem = null;
             ItemStack clonedItem;
 
             //Check if it's a cloned item
             if (isCustomShopItem(meta)) {
-                clonedItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta)).clone();
+                customItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta));
+                clonedItem = customItem.cloneDisplay();
                 removeCustomShopId(clonedItem);
             } else {
                 clonedItem = item.clone();
@@ -131,16 +134,22 @@ public class InventoryClickListener implements Listener {
 
             clonedItem.setAmount(productAmount);
 
-            if (!checkSpace(player, clonedItem)) {
-                player.sendMessage(ChatColor.DARK_RED + "You do not have enough space for this!");
-                return;
+            withdrawAmount(player, price, useBanks);
+
+            if (customItem == null || customItem.giveOnBuy()) {
+
+                if (!checkSpace(player, clonedItem)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You do not have enough space for this!");
+                    return;
+                }
+
+                player.getInventory().addItem(clonedItem);
             }
 
-            player.getInventory().addItem(clonedItem);
+            if (customItem != null)
+                customItem.executeBuyCommands(player.getName());
 
             plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
-
-            withdrawAmount(player, price, useBanks);
 
             player.sendMessage(ChatColor.GREEN + "Bought " + productAmount + " for $" + shortenedForm(price) + "!");
         }
@@ -150,10 +159,12 @@ public class InventoryClickListener implements Listener {
 
             price *= priceMultiplier;
 
+            CustomShopItem customItem = null;
             ItemStack clonedItem;
 
             if (isCustomShopItem(meta)) {
-                clonedItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta)).clone();
+                customItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta));
+                clonedItem = customItem.cloneDisplay();
                 removeCustomShopId(clonedItem);
             } else {
                 clonedItem = new ItemStack(item.getType(), productAmount);
@@ -180,11 +191,16 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            removeItem(player, clonedItem, productAmount);
+            if (customItem == null || customItem.takeOnSell())
+                removeItem(player, clonedItem, productAmount);
 
             plugin.getTransactionManager().sellItem(clonedItem.getType(), productAmount);
 
             depositAmount(player, price, useBanks);
+
+            if (customItem != null)
+                customItem.executeSellCommands(player.getName());
+
 
             player.sendMessage(ChatColor.GREEN + "Sold " + productAmount + " for $" + shortenedForm(price) + "!");
         }

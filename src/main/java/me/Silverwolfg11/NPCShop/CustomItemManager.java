@@ -1,5 +1,6 @@
 package me.Silverwolfg11.NPCShop;
 
+import me.Silverwolfg11.NPCShop.objects.CustomShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,22 +15,22 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CustomItemManager {
 
-    private HashMap<Integer, ItemStack> customItem = new HashMap<>();
+    private Map<Integer, CustomShopItem> customItems = new HashMap<>();
     private NPCShopPlugin plugin;
 
     public CustomItemManager(NPCShopPlugin plugin) {
         this.plugin = plugin;
     }
 
-
     HashMap<String, ItemStack> loadCustomItems(YamlConfiguration config) {
         HashMap<String, ItemStack> customItemMap = new HashMap<>();
 
-        if (!customItem.isEmpty()) customItem.clear();
+        if (!customItems.isEmpty()) customItems.clear();
 
         // If there are no custom items, return the empty map
         if (!config.contains("customitems")) return customItemMap;
@@ -85,7 +86,22 @@ public class CustomItemManager {
 
             stack.setItemMeta(meta);
 
-            customItem.put(id, stack);
+            CustomShopItem customItem = new CustomShopItem(stack);
+
+            customItem.setGiveOnBuy(config.getBoolean(quickpath + "giveonbuy", true));
+            customItem.setTakeOnSell(config.getBoolean(quickpath + "takeonsell", true));
+
+            List<String> buyCmds = config.getStringList(quickpath + ".buycommands");
+
+            if (!buyCmds.isEmpty())
+                customItem.setBuyCommands(buyCmds);
+
+            List<String> sellCmds = config.getStringList(quickpath + ".sellcommands");
+
+            if (!sellCmds.isEmpty())
+                customItem.setSellCommands(buyCmds);
+
+            customItems.put(id, customItem);
 
             id++;
 
@@ -121,7 +137,7 @@ public class CustomItemManager {
             int level;
 
             try {
-                level = Integer.valueOf(split[1]);
+                level = Integer.parseInt(split[1]);
             } catch (NumberFormatException ex) {
                 Bukkit.getLogger().warning("[NPCShop] Error loading enchantment: " + enchantLine + " due to invalid enchantment level!");
                 continue;
@@ -133,8 +149,8 @@ public class CustomItemManager {
         return enchantMap;
     }
 
-    public ItemStack getItemFromIDMap(int id) {
-        return customItem.get(id);
+    public CustomShopItem getItemFromIDMap(int id) {
+        return customItems.get(id);
     }
 
 }

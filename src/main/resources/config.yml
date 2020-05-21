@@ -50,6 +50,12 @@ customitems:
     name: "&cNuker"
     lore:
       - "Nuke yourself!"
+    # Allow for only commands to be executed
+    # by clicking on this item. This will
+    # disable giveonbuy and takeonsell automatically
+    # as well as not check whether the user has enough
+    # money to purchase/sell the item
+    display-item-only: true
     # Give the itemstack when a player buys this?
     giveonbuy: false
     # Take the itemstack when a player sell this?

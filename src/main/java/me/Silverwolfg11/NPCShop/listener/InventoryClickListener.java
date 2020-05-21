@@ -102,8 +102,21 @@ public class InventoryClickListener implements Listener {
 
         double balance = getBalance(player, useBanks);
 
+        CustomShopItem customItem = null;
+
+        if (isCustomShopItem(meta)) {
+            customItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta));
+        }
+
         //Handle buying
         if (holder.getInventoryType().equals(NPCInventoryHolder.NPCInventoryType.BUY)) {
+
+            // Skip Display Item Only
+            if (customItem != null && customItem.isDisplayItemOnly()) {
+                customItem.executeBuyCommands(player.getName());
+                return;
+            }
+
             //Buy Price: 50.0
             double price = Double.parseDouble(line0.substring(11));
 
@@ -114,12 +127,10 @@ public class InventoryClickListener implements Listener {
                 return;
             }
 
-            CustomShopItem customItem = null;
             ItemStack clonedItem;
 
             //Check if it's a cloned item
-            if (isCustomShopItem(meta)) {
-                customItem = plugin.getCustomItemManager().getItemFromIDMap(getCustomShopItem(meta));
+            if (customItem != null) {
                 clonedItem = customItem.cloneDisplay();
                 removeCustomShopId(clonedItem);
             } else {
@@ -137,7 +148,6 @@ public class InventoryClickListener implements Listener {
             withdrawAmount(player, price, useBanks);
 
             if (customItem == null || customItem.giveOnBuy()) {
-
                 if (!checkSpace(player, clonedItem)) {
                     player.sendMessage(ChatColor.DARK_RED + "You do not have enough space for this!");
                     return;
@@ -146,20 +156,26 @@ public class InventoryClickListener implements Listener {
                 player.getInventory().addItem(clonedItem);
             }
 
+            plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
+
             if (customItem != null)
                 customItem.executeBuyCommands(player.getName());
-
-            plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
 
             player.sendMessage(ChatColor.GREEN + "Bought " + productAmount + " for $" + shortenedForm(price) + "!");
         }
         //Handle selling
         else if(holder.getInventoryType().equals(NPCInventoryHolder.NPCInventoryType.SELL)) {
+
+            // Skip Display Item Only
+            if (customItem != null && customItem.isDisplayItemOnly()) {
+                customItem.executeSellCommands(player.getName());
+                return;
+            }
+
             double price = Double.parseDouble(line0.substring(12));
 
             price *= priceMultiplier;
 
-            CustomShopItem customItem = null;
             ItemStack clonedItem;
 
             if (isCustomShopItem(meta)) {
@@ -200,9 +216,6 @@ public class InventoryClickListener implements Listener {
 
             if (customItem != null)
                 customItem.executeSellCommands(player.getName());
-
-
-            player.sendMessage(ChatColor.GREEN + "Sold " + productAmount + " for $" + shortenedForm(price) + "!");
         }
 
     }

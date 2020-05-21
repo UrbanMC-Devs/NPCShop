@@ -25,7 +25,7 @@ public class MapSerializer{
             transaction.bought(array.get(0).getAsInt());
             transaction.sold(array.get(1).getAsInt());
 
-            map.put(Material.valueOf(entry.getKey()), transaction);
+            map.put(Material.getMaterial(entry.getKey()), transaction);
         }
 
         return map;

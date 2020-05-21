@@ -14,6 +14,7 @@ public class CustomShopItem {
 
     private boolean giveOnBuy;
     private boolean takeOnSell;
+    private boolean displayItem;
 
 
     public CustomShopItem(ItemStack displayStack) {
@@ -44,6 +45,15 @@ public class CustomShopItem {
         return takeOnSell;
     }
 
+    public void setDisplayItemOnly(boolean b) {
+        this.displayItem = b;
+        this.giveOnBuy = !b;
+        this.takeOnSell = !b;
+    }
+
+    public boolean isDisplayItemOnly() {
+        return displayItem;
+    }
 
     public ItemStack cloneDisplay() {
         return displayStack.clone();

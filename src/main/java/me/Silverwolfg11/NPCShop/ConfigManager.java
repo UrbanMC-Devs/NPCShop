@@ -126,8 +126,11 @@ public class ConfigManager {
 
                 // Make sure the material is valid
                 try {
-                    material = Material.valueOf(itemPath.toUpperCase());
-                } catch (IllegalArgumentException ex) {
+                    material = Material.matchMaterial(itemPath);
+                } catch (Throwable ex) {
+                }
+
+                if (material == null) {
                     //Check if itempath is a custom item
                     if (customItemMap.containsKey(itemPath)) {
                         stack = customItemMap.get(itemPath).clone();
@@ -138,6 +141,7 @@ public class ConfigManager {
                         continue;
                     }
                 }
+
 
                 if (stack == null)
                  stack = new ItemStack(material);
@@ -243,11 +247,14 @@ public class ConfigManager {
     }
 
     private ItemStack loadItem(YamlConfiguration config, String path) {
-        Material material;
+        Material material = null;
 
         try {
-            material = Material.valueOf(config.getString(path + ".material", "diamond").toUpperCase());
-        } catch (IllegalArgumentException ex) {
+            material = Material.matchMaterial(config.getString(path + ".material", "diamond"));
+        } catch (Exception ex) {
+        }
+
+        if (material == null) {
             throwError("Error loading config. Invalid Item material for " + path);
             material = Material.DIAMOND;
         }

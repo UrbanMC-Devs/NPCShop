@@ -44,11 +44,14 @@ public class CustomItemManager {
         for (String itemPath : section.getKeys(false)) {
             String quickpath = "customitems." + itemPath + ".";
 
-            Material mat;
+            Material mat = null;
 
             try {
-                mat = Material.valueOf(config.getString(quickpath + "material", "null").toUpperCase());
-            } catch (IllegalArgumentException ex) {
+                mat = Material.matchMaterial(config.getString(quickpath + "material", "null"));
+            } catch (Exception ex) {
+            }
+
+            if (mat == null) {
                 Bukkit.getLogger().warning("[NPCShop] Error loading material for custom item " + itemPath);
                 continue;
             }
@@ -88,8 +91,13 @@ public class CustomItemManager {
 
             CustomShopItem customItem = new CustomShopItem(stack);
 
-            customItem.setGiveOnBuy(config.getBoolean(quickpath + "giveonbuy", true));
-            customItem.setTakeOnSell(config.getBoolean(quickpath + "takeonsell", true));
+            customItem.setDisplayItemOnly(config.getBoolean(quickpath + "display-item-only", false));
+
+            // Display item overrides
+            if (!customItem.isDisplayItemOnly()) {
+                customItem.setGiveOnBuy(config.getBoolean(quickpath + "giveonbuy", true));
+                customItem.setTakeOnSell(config.getBoolean(quickpath + "takeonsell", true));
+            }
 
             List<String> buyCmds = config.getStringList(quickpath + ".buycommands");
 

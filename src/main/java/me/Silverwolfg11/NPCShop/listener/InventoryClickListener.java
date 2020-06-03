@@ -145,8 +145,6 @@ public class InventoryClickListener implements Listener {
 
             clonedItem.setAmount(productAmount);
 
-            withdrawAmount(player, price, useBanks);
-
             if (customItem == null || customItem.giveOnBuy()) {
                 if (!checkSpace(player, clonedItem)) {
                     player.sendMessage(ChatColor.DARK_RED + "You do not have enough space for this!");
@@ -155,6 +153,8 @@ public class InventoryClickListener implements Listener {
 
                 player.getInventory().addItem(clonedItem);
             }
+
+            withdrawAmount(player, price, useBanks);
 
             plugin.getTransactionManager().buyItem(clonedItem.getType(), productAmount);
 

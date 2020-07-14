@@ -216,6 +216,8 @@ public class InventoryClickListener implements Listener {
 
             if (customItem != null)
                 customItem.executeSellCommands(player.getName());
+
+            player.sendMessage(ChatColor.GREEN + "Sold " + productAmount + " for $" + shortenedForm(price) + "!");
         }
 
     }

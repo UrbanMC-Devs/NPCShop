@@ -2,7 +2,7 @@
 A shop plugin that allows you to buy/sell items from Citizens2 NPCs. All items are configurable in the config.
 
 ## Installing
-Download the jar from the releases page.
+Download the jar from the [releases page](https://github.com/UrbanMC-Devs/NPCShop/releases/latest).
 
 ## Building
 Standard maven project. Use `mvn clean package` to generate the jar. 
